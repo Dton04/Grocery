@@ -4,19 +4,13 @@ import type { Product } from "../../types/product.types";
 interface ProductListProps {
    products: Product[]
    loading?: boolean
-   onAddToCart?: (product: Product) => void
 }
 
-export const ProductList = ({ products, loading, onAddToCart }: ProductListProps) => {
+export const ProductList = ({ products, loading }: ProductListProps) => {
    if (loading) {
-      return <div className="text-center py-8">Loading...</div>
+      return <div className="text-center py-8">Đang tải...</div>
    }
 
-   if (!products.length) {
-      return <div className="text-center py-8">No products found</div>
-   }
-
-   //Hiển thị empty state
    if (products.length === 0) {
       return <div className="text-center py-8">Không có sản phẩm nào</div>
    }
@@ -28,7 +22,6 @@ export const ProductList = ({ products, loading, onAddToCart }: ProductListProps
             <ProductCard
                key={product._id}
                product={product}
-               onAddToCart={onAddToCart}
             />
          ))}
       </div>

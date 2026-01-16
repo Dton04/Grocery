@@ -1,13 +1,15 @@
 import { Card, Button, Rate, Tag } from 'antd'
 import { ShoppingCartOutlined } from '@ant-design/icons'
 import type { Product } from '../../types/product.types'
+import { useCartContext } from '../../contexts/CartContext'
 
 interface ProductCardProps {
    product: Product
-   onAddToCart?: (product: Product) => void
 }
 
-export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+export const ProductCard = ({ product }: ProductCardProps) => {
+   const { addItem } = useCartContext()
+
    return (
       <Card
          hoverable
@@ -66,19 +68,17 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
          </div>
 
          {/* Add to Cart Button */}
-         {onAddToCart && (
-            <Button
-               type="primary"
-               icon={<ShoppingCartOutlined />}
-               block
-               size="large"
-               disabled={product.stock === 0}
-               onClick={() => onAddToCart(product)}
-               className="bg-primary hover:bg-green-600"
-            >
-               Thêm vào giỏ
-            </Button>
-         )}
+         <Button
+            type="primary"
+            icon={<ShoppingCartOutlined />}
+            block
+            size="large"
+            disabled={product.stock === 0}
+            onClick={() => addItem(product)}
+            className="bg-primary hover:bg-green-600"
+         >
+            Thêm vào giỏ
+         </Button>
       </Card>
    )
 }

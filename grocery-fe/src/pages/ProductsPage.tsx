@@ -24,12 +24,6 @@ export const ProductsPage = () => {
       fetchProducts()
    }, [])
 
-   // Handle add to cart
-   const handleAddToCart = (product: Product) => {
-      console.log('Add to cart:', product)
-      alert(`Đã thêm ${product.name} vào giỏ hàng!`)
-   }
-
    // Render error
    if (error) {
       return (
@@ -45,7 +39,6 @@ export const ProductsPage = () => {
          <ProductList
             products={products}
             loading={loading}
-            onAddToCart={handleAddToCart}
          />
       </div>
    )
