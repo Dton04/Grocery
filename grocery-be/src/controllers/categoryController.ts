@@ -77,10 +77,22 @@ export const getCategoryById = asyncHandler(async (req, res) => {
 })
 
 /**
- * @desc    Tạo danh mục mới
- * @route   POST /api/category
- * @access  Private (Admin)
+ * @swagger
+ * /api/category:
+ *   post:
+ *     summary: Tạo danh mục mới
+ *     tags: [Categories]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CategoryInput'
+ *     responses:
+ *       201:
+ *         description: Success
  */
+
 export const createCategory = asyncHandler(async (req, res) => {
    const categoryData: ICategoryInput = req.body
 

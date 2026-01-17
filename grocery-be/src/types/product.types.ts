@@ -55,7 +55,20 @@ export interface IProductQuery {
  */
 export interface IProductListResponse {
    products: IProduct[] // Mảng sản phẩm
-   total: number // Tổng số sản phẩm
-   page: number // Trang hiện tại
-   totalPages: number // Tổng số trang
+   pagination: {
+      page: number
+      limit: number
+      total: number
+      totalPages: number
+   }
 }
+
+// Filters cho getAllProducts
+export interface ProductFilters {
+   page?: number
+   limit?: number
+   category?: string
+   stockStatus?: 'in-stock' | 'low-stock' | 'out-of-stock'
+   search?: string
+}
+

@@ -1,7 +1,6 @@
-import { User } from '../models/User'
 import { asyncHandler } from '../utils/asyncHandler'
-import { NotFoundError, UnauthorizedError, ValidationError } from '../utils/customErrors'
-import { generateToken } from '../utils/jwt'
+import { ValidationError } from '../utils/customErrors'
+import { AuthService } from '../services/authService'
 
 /**
  * @swagger
@@ -35,38 +34,30 @@ import { generateToken } from '../utils/jwt'
 export const register = asyncHandler(async (req, res) => {
    const { email, password, fullName } = req.body
 
-   // Validation
+   // Validate input
    if (!email || !password || !fullName) {
       throw new ValidationError('Vui lòng điền đầy đủ thông tin')
    }
 
-   // Kiểm tra email đã tồn tại chưa
-   const existingUser = await User.findOne({ email })
-   if (existingUser) {
-      throw new ValidationError('Email đã được sử dụng')
-   }
-
-   // Tạo user (password sẽ tự động hash bởi pre-save middleware)
-   const user = await User.create({
+   const result = await AuthService.register({
       email,
       password,
       fullName,
+      role: 'customer',
+      isActive: true,
    })
-
-   // Tạo JWT token
-   const token = generateToken(user._id)
 
    res.status(201).json({
       success: true,
       message: 'Đăng ký thành công',
       data: {
          user: {
-            _id: user._id,
-            email: user.email,
-            fullName: user.fullName,
-            role: user.role,
+            _id: result._id,
+            email: result.email,
+            fullName: result.fullName,
+            role: result.role,
          },
-         token,
+         token: result.token,
       },
    })
 })
@@ -100,39 +91,24 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
    const { email, password } = req.body
 
-   // Validation
+   // Validate input
    if (!email || !password) {
       throw new ValidationError('Vui lòng nhập email và password')
    }
 
-   // Tìm user
-   const user = await User.findOne({ email })
-
-   if (!user) {
-      throw new NotFoundError('Email không tồn tại')
-   }
-
-   // So sánh password (gọi trên instance 'user', KHÔNG phải Model 'User')
-   const isMatch = await user.comparePassword(password)
-
-   if (!isMatch) {
-      throw new UnauthorizedError('Sai mật khẩu')
-   }
-
-   // Tạo JWT token
-   const token = generateToken(user._id)
+   const result = await AuthService.login({ email, password })
 
    res.json({
       success: true,
       message: 'Đăng nhập thành công',
       data: {
          user: {
-            _id: user._id,
-            email: user.email,
-            fullName: user.fullName,
-            role: user.role,
+            _id: result._id,
+            email: result.email,
+            fullName: result.fullName,
+            role: result.role,
          },
-         token,
+         token: result.token,
       },
    })
 })

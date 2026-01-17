@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { Product } from '../models/Product'
-import { IProductInput, IProductUpdate } from '../types/product.types'
+import { IProductInput, IProductUpdate, ProductFilters } from '../types/product.types'
 import { asyncHandler } from '../utils/asyncHandler'
 import { NotFoundError, ValidationError } from '../utils/customErrors'
-
+import { ProductService } from '../services/productService'
 /**
  * @swagger
  * /api/products:
@@ -45,57 +45,21 @@ import { NotFoundError, ValidationError } from '../utils/customErrors'
  */
 export const getAllProducts = asyncHandler(async (req, res) => {
    // 1. Parse query params
-   const page = parseInt(req.query.page as string) || 1
-   const limit = parseInt(req.query.limit as string) || 10
-   const skip = (page - 1) * limit
 
-   const category = req.query.category as string
-   const stockStatus = req.query.stockStatus as string
-   const search = req.query.search as string
-
-   // 2. Build filter object
-   const filter: any = { isActive: true }
-
-   // Category filter
-   if (category) {
-      filter.category = category
+   const filters: ProductFilters = {
+      page: parseInt(req.query.page as string) || 1,
+      limit: parseInt(req.query.limit as string) || 10,
+      category: req.query.category as string,
+      stockStatus: req.query.stockStatus as any,
+      search: req.query.search as string,
    }
 
-   // Stock status filter
-   if (stockStatus === 'out-of-stock') {
-      filter.stock = 0
-   } else if (stockStatus === 'low-stock') {
-      filter.stock = { $gt: 0, $lt: 20 }
-   } else if (stockStatus === 'in-stock') {
-      filter.stock = { $gte: 20 }
-   }
-
-   // Search filter (case-insensitive regex)
-   if (search) {
-      filter.name = { $regex: search, $options: 'i' }
-   }
-
-   // 3. Fetch products với filter
-   const products = await Product.find(filter)
-      .limit(limit)
-      .skip(skip)
-      .sort({ createdAt: -1 })
-
-   // 4. Count total documents với filter
-   const total = await Product.countDocuments(filter)
+   const result = await ProductService.getAllProducts(filters)
 
    // 5. Return response
    res.status(200).json({
       success: true,
-      data: {
-         products,
-         pagination: {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit),
-         },
-      },
+      data: result,
    })
 })
 
@@ -120,11 +84,8 @@ export const getAllProducts = asyncHandler(async (req, res) => {
  */
 export const getProductById = asyncHandler(async (req, res) => {
    const { id } = req.params
-   const product = await Product.findById(id)
 
-   if (!product) {
-      throw new NotFoundError('Không tìm thấy sản phẩm')
-   }
+   const product = await ProductService.getProductById(id as string)
 
    res.status(200).json({
       success: true,
@@ -175,12 +136,7 @@ export const getProductById = asyncHandler(async (req, res) => {
 export const createProduct = asyncHandler(async (req, res) => {
    const productData: IProductInput = req.body
 
-   if (!req.body.name) {
-      throw new ValidationError('Tên sản phẩm là bắt buộc nha bạn')
-   }
-
-   // Tạo sản phẩm mới
-   const product = await Product.create(productData)
+   const product = await ProductService.createProduct(productData)
 
    res.status(201).json({
       success: true,
@@ -226,16 +182,9 @@ export const createProduct = asyncHandler(async (req, res) => {
  */
 export const updateProduct = asyncHandler(async (req, res) => {
    const { id } = req.params
-   const updateData: IProductUpdate = req.body
+   const updateData = req.body
 
-   const product = await Product.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true,
-   })
-
-   if (!product) {
-      throw new NotFoundError('Không tìm thấy sản phẩm')
-   }
+   const product = await ProductService.updateProduct(id as string, updateData)
 
    res.status(200).json({
       success: true,
@@ -267,20 +216,10 @@ export const updateProduct = asyncHandler(async (req, res) => {
 export const deleteProduct = asyncHandler(async (req, res) => {
    const { id } = req.params
 
-   // Soft delete - chỉ set isActive = false
-   const product = await Product.findByIdAndUpdate(
-      id,
-      { isActive: false },
-      { new: true }
-   )
-
-   if (!product) {
-      throw new NotFoundError('Không tìm thấy sản phẩm')
-   }
+   await ProductService.deleteProduct(id as string)
 
    res.status(200).json({
       success: true,
       message: 'Xóa sản phẩm thành công',
-      data: product,
    })
 })
