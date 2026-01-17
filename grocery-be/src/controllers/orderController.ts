@@ -3,9 +3,30 @@ import { asyncHandler } from '../utils/asyncHandler'
 import { NotFoundError, UnauthorizedError, ValidationError } from '../utils/customErrors'
 
 /**
- * @desc    Tạo order mới
- * @route   POST /api/orders
- * @access  Private (Customer)
+ * @swagger
+ * /api/orders:
+ *   post:
+ *     summary: Create new order
+ *     tags: [Orders]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - items
+ *               - shippingAddress
+ *             properties:
+ *               items:
+ *                 type: array
+ *               shippingAddress:
+ *                 type: object
+ *     responses:
+ *       201:
+ *         description: Order created
  */
 export const createOrder = asyncHandler(async (req, res) => {
    const { items, shippingAddress, note } = req.body

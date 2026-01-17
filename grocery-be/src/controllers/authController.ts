@@ -4,9 +4,33 @@ import { NotFoundError, UnauthorizedError, ValidationError } from '../utils/cust
 import { generateToken } from '../utils/jwt'
 
 /**
- * @desc    Đăng ký user mới
- * @route   POST /api/auth/register
- * @access  Public
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - fullName
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               fullName:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User registered
+ *       400:
+ *         description: Validation error
  */
 export const register = asyncHandler(async (req, res) => {
    const { email, password, fullName } = req.body
@@ -48,9 +72,30 @@ export const register = asyncHandler(async (req, res) => {
 })
 
 /**
- * @desc    Đăng nhập
- * @route   POST /api/auth/login
- * @access  Public
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
  */
 export const login = asyncHandler(async (req, res) => {
    const { email, password } = req.body

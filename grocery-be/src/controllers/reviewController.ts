@@ -4,9 +4,36 @@ import { asyncHandler } from '../utils/asyncHandler'
 import { ValidationError, NotFoundError, UnauthorizedError } from '../utils/customErrors'
 
 /**
- * @desc    Tạo review cho sản phẩm
- * @route   POST /api/reviews/products/:productId
- * @access  Private
+ * @swagger
+ * /api/reviews/products/{productId}:
+ *   post:
+ *     summary: Create product review
+ *     tags: [Reviews]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - rating
+ *               - comment
+ *             properties:
+ *               rating:
+ *                 type: number
+ *               comment:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Review created
  */
 export const createReview = asyncHandler(async (req, res) => {
    const { rating, comment } = req.body

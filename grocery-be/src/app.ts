@@ -8,9 +8,13 @@ import { errorHandler } from './middleware/errorHandler'
 import { logger } from './middleware/logger'
 import orderRoutes from './routes/orderRoutes'
 import reviewRoutes from './routes/reviewRoutes'
+import { setupSwagger } from './config/swagger'
 
 
 export const app: Application = express()
+
+// Swagger UI
+setupSwagger(app)
 
 // Middleware
 app.use(cors())

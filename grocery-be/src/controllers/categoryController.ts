@@ -6,9 +6,14 @@ import { AppError } from '../utils/AppError'
 import { NotFoundError, ValidationError } from '../utils/customErrors'
 
 /**
- * @desc    Lấy tất cả danh mục
- * @route   GET /api/category
- * @access  Public
+ * @swagger
+ * /api/category:
+ *   get:
+ *     summary: Get all categories
+ *     tags: [Categories]
+ *     responses:
+ *       200:
+ *         description: Success
  */
 export const getAllCategories = asyncHandler(async (req, res) => {
    // Query parameters
@@ -40,9 +45,22 @@ export const getAllCategories = asyncHandler(async (req, res) => {
 })
 
 /**
- * @desc    Lấy danh mục theo ID
- * @route   GET /api/category/:id
- * @access  Public
+ * @swagger
+ * /api/category/{id}:
+ *   get:
+ *     summary: Get category by ID
+ *     tags: [Categories]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *       404:
+ *         description: Not found
  */
 export const getCategoryById = asyncHandler(async (req, res) => {
    const { id } = req.params
