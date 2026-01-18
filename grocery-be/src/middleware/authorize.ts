@@ -9,11 +9,11 @@ export const authorize = (...roles: string[]) => {
    return (req: Request, res: Response, next: NextFunction) => {
       // TODO 2: Kiểm tra req.user có tồn tại không
       if (!req.user) {
-         throw new UnauthorizedError('Vui lòng đăng nhập để truy cập')
+         throw new UnauthorizedError('Bạn phải đăng nhập để truy cập')
       }
       // TODO 3: Kiểm tra role của user có trong danh sách roles không
       if (!roles.includes(req.user.role)) {
-         throw new UnauthorizedError('Vui lòng đăng nhập để truy cập')
+         throw new UnauthorizedError('Bạn không có quyền truy cập')
       }
       // TODO 4: Nếu OK, gọi next()
       next()

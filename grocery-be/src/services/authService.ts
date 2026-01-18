@@ -43,10 +43,10 @@ export class AuthService {
          throw new ValidationError('Email không hợp lệ')
       }
 
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$/
-      if (!passwordRegex.test(password)) {
-         throw new ValidationError('Password phải có ít nhất 5 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
-      }
+      // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{5,}$/
+      // if (!passwordRegex.test(password)) {
+      //    throw new ValidationError('Password phải có ít nhất 5 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt')
+      // }
 
       const user = await User.findOne({ email })
       if (!user) {
