@@ -7,6 +7,7 @@
  * Mô tả đầy đủ cấu trúc của một sản phẩm
  */
 
+import { Model } from "mongoose"
 import { ProductUnit } from "./common.types"
 
 export interface IProduct {
@@ -23,6 +24,9 @@ export interface IProduct {
    unit: ProductUnit
    averageRating?: number    // TODO: Thêm field này
    numReviews?: number       // TODO: Thêm field này
+   sku?: string              // SKU (Stock Keeping Unit) - Mã sản phẩm tự động
+   isLowStock(): boolean   // Instance methods
+   discountedPrice: number // Virtual field
 }
 
 /**
@@ -72,3 +76,8 @@ export interface ProductFilters {
    search?: string
 }
 
+export interface IProductModel extends Model<IProduct> {
+   findLowStock(): Promise<IProduct[]>
+
+   findByCategory(categoryId: string): Promise<IProduct[]>
+}

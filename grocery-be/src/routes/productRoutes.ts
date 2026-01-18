@@ -5,6 +5,8 @@ import {
    createProduct,
    updateProduct,
    deleteProduct,
+   checkLowStock,
+   getLowStockProducts,
 } from '../controllers/productController'
 import { protect } from '../middleware/auth'
 import { authorize } from '../middleware/authorize'
@@ -18,6 +20,7 @@ const router = express.Router()
  */
 router.get('/', getAllProducts)
 
+router.get('/low-stock', getLowStockProducts)
 /**
  * @route   GET /api/products/:id
  * @desc    Lấy sản phẩm theo ID
@@ -45,5 +48,8 @@ router.put('/:id', protect, authorize('admin'), updateProduct)
  * @access  Private (Admin)
  */
 router.delete('/:id', protect, authorize('admin'), deleteProduct)
+
+router.get('/:id/check-stock', checkLowStock)
+
 
 export default router

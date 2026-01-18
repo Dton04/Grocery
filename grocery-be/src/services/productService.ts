@@ -25,11 +25,6 @@ export class ProductService {
          filter.category = category
       }
 
-      //Stock filter
-      if (category) {
-         filter.category = category
-      }
-
       //Stock status filter
       if (stockStatus === 'out-of-stock') {
          filter.stock = 0
@@ -41,7 +36,7 @@ export class ProductService {
 
       // Search filter
       if (search) {
-         filter.name = { $regex: search, $options: 'i]' }
+         filter.name = { $regex: search, $options: 'i' }
       }
 
       //4 Fetch products
@@ -66,10 +61,13 @@ export class ProductService {
 
    static async getProductById(id: string): Promise<IProduct> {
       const product = await Product.findById(id)
+
       if (!product) {
          throw new NotFoundError('Product not found')
       }
+
       return product
+
    }
 
    static async createProduct(data: IProductInput): Promise<IProduct> {

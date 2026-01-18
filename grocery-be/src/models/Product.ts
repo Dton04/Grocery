@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from 'mongoose'
-import { IProduct } from '../types/product.types'
+import { IProduct, IProductModel } from '../types/product.types'
 
 /**
  * Mongoose Schema cho Product
@@ -56,10 +56,17 @@ const productSchema = new Schema<IProduct>(
       numReviews: {
          type: Number,
          default: 0
+      },
+      sku: {
+         type: String,
+         unique: true,
+         sparse: true, // Cho phép nhiều document không có SKU
       }
    },
    {
-      timestamps: true, // Tự động thêm createdAt và updatedAt
+      timestamps: true,
+      toJSON: { virtuals: true },
+      toObject: { virtuals: true }
    }
 )
 
@@ -91,22 +98,84 @@ productSchema.statics.findByCategory = function (categoryId: string) {
    return this.find({ category: categoryId, isActive: true })
 }
 
-/**
- * Middleware - chạy trước khi save
- */
-productSchema.pre('save', function () {
-   // Tự động chuyển tên thành chữ hoa đầu câu
-   if (this.isModified('name')) {
-      this.name = this.name.charAt(0).toUpperCase() + this.name.slice(1)
-   }
-})
-
 productSchema.virtual('fullInfo').get(function () {
    return `Tên: ${this.name} - Giá: ${this.price} VNĐ - Tồn kho: ${this.stock}`
 })
 
 
 /**
+ * MONGOOSE HOOKS
+ */
+
+/**
+ * Bài 1: Pre-save Hook - Auto Uppercase Product Name
+ * Chạy TRƯỚC khi save document vào database
+ */
+productSchema.pre('save', function (next) {
+   // TODO: Uppercase tên sản phẩm
+   // Hint: this.name = this.name.toUpperCase()
+   if (this.isModified('name')) {
+      this.name = this.name.toUpperCase()
+   }
+})
+
+/**
+ * Bài 2: Pre-save Hook - Auto Generate SKU
+ * Generate SKU nếu chưa có
+ */
+productSchema.pre('save', function () {
+   // Check: Có SKU chưa?
+   if (!this.sku) {
+      // Generate SKU = PRD-{timestamp}
+      this.sku = `PRD-${Date.now()}`
+   }
+})
+
+/**
+ * Bài 3: Post-save Hook - Log Activity
+ * TODO: Log product name sau khi save
+ */
+
+productSchema.post('save', function (doc) {
+   console.log(`Product saved: ${doc.name}`)
+})
+
+/**
+ * Bài 4: Pre-update Hook - Validate Stock
+ * TODO: Validate stock không được < 0
+ */
+productSchema.pre('findOneAndUpdate', function (next) {
+   const update = this.getUpdate() as any
+   if (update.stock < 0) {
+      throw new Error('Stock không được âm nhé')
+   }
+   next()
+})
+
+/**
+ * Bài 5: Virtual Field - Discount Price
+ * TODO: Tạo virtual field discountedPrice
+ */
+productSchema.virtual('discountedPrice').get(function () {
+   return this.price * 0.9
+})
+
+/**
+ * Bài 6: Instance Method - isLowStock()
+ * TODO: Return true nếu stock < 20
+ */
+productSchema.methods.isLowStock = function () {
+   return this.stock < 20
+}
+
+/**
+ * Bài 7: Static Method - findLowStock()
+ * TODO: Find all products với stock < 20
+ */
+productSchema.statics.findLowStock = function () {
+   return this.find({ stock: { $lt: 20 } })
+}
+/**
  * Export Model với type IProduct
  */
-export const Product: Model<IProduct> = mongoose.model<IProduct>('Product', productSchema)
+export const Product = mongoose.model<IProduct, IProductModel>('Product', productSchema)

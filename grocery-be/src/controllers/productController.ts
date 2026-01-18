@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
-import { Product } from '../models/Product'
 import { IProductInput, IProductUpdate, ProductFilters } from '../types/product.types'
 import { asyncHandler } from '../utils/asyncHandler'
 import { NotFoundError, ValidationError } from '../utils/customErrors'
 import { ProductService } from '../services/productService'
+import { Product } from '../models/Product'
 /**
  * @swagger
  * /api/products:
@@ -86,6 +86,8 @@ export const getProductById = asyncHandler(async (req, res) => {
    const { id } = req.params
 
    const product = await ProductService.getProductById(id as string)
+
+
 
    res.status(200).json({
       success: true,
@@ -221,5 +223,46 @@ export const deleteProduct = asyncHandler(async (req, res) => {
    res.status(200).json({
       success: true,
       message: 'Xóa sản phẩm thành công',
+   })
+})
+
+
+/**
+ * Test instance method
+ */
+export const checkLowStock = asyncHandler(async (req, res) => {
+   const { id } = req.params
+
+   const product = await Product.findById(id)
+
+   if (!product) {
+      throw new NotFoundError('Product not found')
+   }
+
+   // Call instance method
+   const isLow = product.isLowStock()
+
+   res.json({
+      success: true,
+      data: {
+         name: product.name,
+         stock: product.stock,
+         isLowStock: isLow,
+         message: isLow ? 'Sắp hết hàng!' : 'Còn đủ hàng'
+      }
+   })
+})
+
+/**
+ * Get low stock products
+ */
+export const getLowStockProducts = asyncHandler(async (req, res) => {
+   // Call static method
+   const products = await Product.findLowStock()
+
+   res.json({
+      success: true,
+      count: products.length,
+      data: products
    })
 })
