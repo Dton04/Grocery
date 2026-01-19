@@ -10,6 +10,8 @@ import {
 } from '../controllers/productController'
 import { protect } from '../middleware/auth'
 import { authorize } from '../middleware/authorize'
+import { validate, validateQuery } from '../middleware/validate'
+import { createProductSchema, updateProductSchema, getProductsQuerySchema } from '../validators/productValidator'
 
 const router = express.Router()
 
@@ -18,7 +20,7 @@ const router = express.Router()
  * @desc    Lấy tất cả sản phẩm (có phân trang)
  * @access  Public
  */
-router.get('/', getAllProducts)
+router.get('/', validateQuery(getProductsQuerySchema), getAllProducts)
 
 router.get('/low-stock', getLowStockProducts)
 /**
@@ -33,21 +35,29 @@ router.get('/:id', protect, getProductById)
  * @desc    Tạo sản phẩm mới
  * @access  Private (Admin)
  */
-router.post('/', protect, authorize('admin'), createProduct)
+router.post('/', protect,
+   authorize('admin'),
+   validate(createProductSchema),
+   createProduct)
 
 /**
  * @route   PUT /api/products/:id
  * @desc    Cập nhật sản phẩm
  * @access  Private (Admin)
  */
-router.put('/:id', protect, authorize('admin'), updateProduct)
+router.put('/:id', protect,
+   authorize('admin'),
+   validate(updateProductSchema),
+   updateProduct)
 
 /**
  * @route   DELETE /api/products/:id
  * @desc    Xóa sản phẩm (soft delete)
  * @access  Private (Admin)
  */
-router.delete('/:id', protect, authorize('admin'), deleteProduct)
+router.delete('/:id', protect,
+   authorize('admin'),
+   deleteProduct)
 
 router.get('/:id/check-stock', checkLowStock)
 
