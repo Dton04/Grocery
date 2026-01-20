@@ -266,3 +266,26 @@ export const getLowStockProducts = asyncHandler(async (req, res) => {
       data: products
    })
 })
+
+/**
+ * Upload product image
+ */
+export const uploadProductImage = asyncHandler(async (req, res) => {
+   const { id } = req.params
+
+   // Check file
+   if (!req.file) {
+      throw new ValidationError('No file uploaded')
+   }
+
+   // Call service
+   const product = await ProductService.uploadProductImage(id, req.file.path)
+
+   res.status(200).json({
+      success: true,
+      message: 'Upload image thành công',
+      data: product
+   })
+})
+
+

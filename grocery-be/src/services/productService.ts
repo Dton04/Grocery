@@ -1,6 +1,8 @@
 import { Product } from "../models/Product";
 import { IProduct, IProductInput, ProductFilters, IProductListResponse } from "../types/product.types";
 import { NotFoundError, ValidationError } from "../utils/customErrors";
+import cloudinary from "../config/cloudinary";
+import fs from 'fs'
 
 export class ProductService {
 
@@ -98,5 +100,33 @@ export class ProductService {
       if (!product) {
          throw new NotFoundError('Không tìm thấy sản phẩm')
       }
+   }
+
+   static async uploadProductImage(id: string, filePath: string): Promise<IProduct> {
+      const product = await Product.findById(id)
+      if (!product) {
+         throw new NotFoundError('Không tìm thấy sản phẩm')
+      }
+
+      // Delete old image
+      if (product.imagePublicId) {
+         await cloudinary.uploader.destroy(product.imagePublicId)
+      }
+
+      // Upload new image
+      const result = await cloudinary.uploader.upload(filePath, {
+         folder: 'grocery-products',
+         transformation: [{ width: 800, height: 800, crop: 'limit' }]
+      })
+
+      // Delete local file
+      fs.unlinkSync(filePath)
+
+      // Update product
+      product.imageUrl = result.secure_url
+      product.imagePublicId = result.public_id
+      await product.save()
+
+      return product
    }
 }

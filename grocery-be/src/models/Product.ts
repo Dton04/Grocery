@@ -36,7 +36,11 @@ const productSchema = new Schema<IProduct>(
       },
       imageUrl: {
          type: String,
-         default: '',
+         default: ''
+      },
+      imagePublicId: {
+         type: String,
+         default: ''
       },
       unit: {
          type: String,
@@ -146,7 +150,7 @@ productSchema.post('save', function (doc) {
  */
 productSchema.pre('findOneAndUpdate', function (next) {
    const update = this.getUpdate() as any
-   if (update.stock < 0) {
+   if (update.stock !== undefined && update.stock < 0) {
       throw new Error('Stock không được âm nhé')
    }
    next()

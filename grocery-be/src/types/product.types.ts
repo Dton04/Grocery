@@ -27,6 +27,7 @@ export interface IProduct {
    sku?: string              // SKU (Stock Keeping Unit) - Mã sản phẩm tự động
    isLowStock(): boolean   // Instance methods
    discountedPrice: number // Virtual field
+   imagePublicId?: string
 }
 
 /**

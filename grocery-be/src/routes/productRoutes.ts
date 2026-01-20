@@ -7,11 +7,13 @@ import {
    deleteProduct,
    checkLowStock,
    getLowStockProducts,
+   uploadProductImage
 } from '../controllers/productController'
 import { protect } from '../middleware/auth'
 import { authorize } from '../middleware/authorize'
 import { validate, validateQuery } from '../middleware/validate'
 import { createProductSchema, updateProductSchema, getProductsQuerySchema } from '../validators/productValidator'
+import { upload } from '../middleware/upload'
 
 const router = express.Router()
 
@@ -60,6 +62,18 @@ router.delete('/:id', protect,
    deleteProduct)
 
 router.get('/:id/check-stock', checkLowStock)
+
+/**
+ * @route   PUT /api/products/:id/image
+ * @desc    Upload product image
+ * @access  Private (Admin)
+ */
+router.put('/:id/image',
+   protect,
+   authorize('admin'),
+   upload.single('image'),
+   uploadProductImage
+)
 
 
 export default router
