@@ -9,9 +9,20 @@ export const validate = (schema: Joi.ObjectSchema) => {
          stripUnknown: true, // Xóa fields không có trong schema
       })
       if (error) {
-         const message = error.details.map((d) => d.message).join(', ')
-         return next(new ValidationError(message))
+         // TODO: Format errors thành array
+         const errors = error.details.map(detail => ({
+            field: detail.path.join('.'),
+            message: detail.message
+         }))
+
+         // TODO: Return structured response
+         return res.status(400).json({
+            success: false,
+            message: 'Validation failed',
+            errors
+         })
       }
+
       next()
    }
 }
