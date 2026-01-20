@@ -1,6 +1,13 @@
 import Joi from 'joi'
 import { vietnameseMessages } from './messages'
 
+const skuValidator = (value: string, helpers: Joi.CustomHelpers) => {
+   if (!value.startsWith('PRD-')) {
+      return helpers.error('any.invalid', { message: 'SKU phải bắt đầu với PRD-' })
+   }
+   return value
+
+}
 export const createProductSchema = Joi.object({
    name: Joi.string()
       .min(3)
@@ -18,6 +25,19 @@ export const createProductSchema = Joi.object({
    stock: Joi.number().min(0).required().label('Số lượng tồn kho'),
    imageUrl: Joi.string().uri().optional().label('URL hình ảnh'),
    unit: Joi.string().valid('kg', 'gram', 'lít', 'chai', 'bịch', 'gói', 'bộ').required().label('Đơn vị'),
+   sku: Joi.string()
+      .custom(skuValidator)
+      .messages({
+         'any.invalid': 'SKU phải bắt đầu với PRD-'
+      })
+      .optional(),
+   onSale: Joi.boolean().optional(),
+   discountPrice: Joi.number()
+      .when('onSale', {
+         is: true,
+         then: Joi.required(),          //Neu onSale = true -> required
+         otherwise: Joi.optional()     //Neu onSale = false -> optional
+      })
 }).messages(vietnameseMessages)
 
 export const updateProductSchema = Joi.object({
