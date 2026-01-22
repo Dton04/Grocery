@@ -10,6 +10,7 @@ import orderRoutes from './routes/orderRoutes'
 import reviewRoutes from './routes/reviewRoutes'
 import { setupSwagger } from './config/swagger'
 import uploadRoutes from './routes/uploadRoutes'
+import cartRoutes from './routes/cartRoutes'
 
 export const app: Application = express()
 
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/reviews', reviewRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/cart', cartRoutes)
 app.use('/uploads', express.static('uploads'))
 
 // Health check route
