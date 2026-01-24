@@ -36,7 +36,7 @@ export const validateQuery = (schema: Joi.ObjectSchema) => {
       })
       if (error) {
          const message = error.details.map((d) => d.message).join(', ')
-         return next(new ValidationError(message))
+         throw new ValidationError(message)
       }
       next()
    }
