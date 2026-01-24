@@ -41,3 +41,22 @@ export const validateQuery = (schema: Joi.ObjectSchema) => {
       next()
    }
 }
+
+//validate params
+export const validateParams = (schema: Joi.ObjectSchema) => {
+   return (req: Request, res: Response, next: NextFunction) => {
+      const { error, value } = schema.validate(req.params, {
+         abortEarly: false,
+         stripUnknown: true,
+      })
+      if (error) {
+         const errorMessage = error.details
+            .map(detail => detail.message)
+            .join(', ')
+
+         throw new ValidationError(errorMessage)
+      }
+      req.params = value
+      next()
+   }
+}

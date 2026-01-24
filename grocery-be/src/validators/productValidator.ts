@@ -57,3 +57,10 @@ export const getProductsQuerySchema = Joi.object({
    stockStatus: Joi.string().valid('in-stock', 'low-stock', 'out-of-stock').optional(),
    search: Joi.string().optional(),
 }).messages(vietnameseMessages)
+
+
+export const getProductIdParamsSchema = Joi.object({
+   productId: Joi.string()
+      .pattern(/^[0-9a-fA-F]{24}$/)
+      .required()
+}).messages(vietnameseMessages)
