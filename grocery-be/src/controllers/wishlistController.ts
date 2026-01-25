@@ -6,7 +6,11 @@ export const addToWishlist = asyncHandler(async (req: Request, res: Response) =>
    const userId = req.user!._id.toString()
    const { productId } = req.body
    const wishlist = await WishlistService.addToWishlist(userId, { productId })
-   res.status(200).json(wishlist)
+   res.status(200).json({
+      success: true,
+      message: 'Đã thêm vào danh sách yêu thích',
+      data: wishlist
+   })
 })
 
 export const getWishlist = asyncHandler(async (req: Request, res: Response) => {
@@ -44,7 +48,7 @@ export const clearWishlist = asyncHandler(async (req: Request, res: Response) =>
 export const addToCartFromWishlist = asyncHandler(async (req: Request, res: Response) => {
    const userId = req.user!._id.toString()
    const { productId } = req.params as { productId: string }
-   const { quantity } = req.body
+   const { quantity = 1 } = req.body || {}  // Default quantity = 1
 
    const { wishlist, cart } = await WishlistService.addToCartFromWishlist(userId, productId, quantity)
    res.status(200).json({
